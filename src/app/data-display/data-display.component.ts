@@ -1,61 +1,74 @@
-import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Chart } from 'chart.js';
+import { Component, OnInit } from '@angular/core';
+import { Chart, LinearScale, Title, Tooltip, Legend, CategoryScale, LineController, LineElement, PointElement } from 'chart.js';
+
+// Register the necessary components
+Chart.register(
+  LinearScale,
+  CategoryScale,
+  Title,
+  Tooltip,
+  Legend,
+  LineController, // Register the LineController
+  LineElement,   // Register the LineElement
+  PointElement   // Register the PointElement (required for line charts)
+);
 
 @Component({
   selector: 'app-data-display',
-  standalone: true,
-  imports: [CommonModule],
   templateUrl: './data-display.component.html',
   styleUrls: ['./data-display.component.scss']
 })
 export class DataDisplayComponent implements OnInit {
-
-  httpClient = inject(HttpClient);
-  data: any = [];  // ข้อมูลหุ้น
   chart: any;
 
   ngOnInit(): void {
+    console.log('Component initialized'); // Log 1
     this.fetchData();
   }
 
   fetchData() {
-    // ใช้ API ของ Alpha Vantage เพื่อดึงข้อมูลหุ้น AAPL
-    this.httpClient.get('https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=AAPL&apikey=2CPEK24O2ZJ0GRIM')
-      .subscribe((response: any) => {
-        const timeSeries = response['Time Series (Daily)'];
-        const labels = Object.keys(timeSeries).reverse();  // วันที่
-        const prices = Object.values(timeSeries).reverse().map((item: any) => item['4. close']);  // ราคาหุ้น
-
-        this.data = prices;
-
-        // แสดงกราฟ
-        this.renderChart(labels, prices);
-      });
+    console.log('Fetching data...'); // Log 2
+    // Simulate fetching data
+    this.renderChart();
   }
 
-  renderChart(labels: any[], data: any[]) {
-    this.chart = new Chart('stockChart', {
-      type: 'line',  // ใช้กราฟแบบ Line
-      data: {
-        labels: labels,
-        datasets: [{
-          label: 'ราคาหุ้น AAPL',
-          data: data,
-          borderColor: 'rgba(75, 192, 192, 1)',
-          borderWidth: 1,
-          fill: false
-        }]
-      },
+  renderChart() {
+    console.log('Rendering chart...'); // Log 3
+
+    // Check if canvas element exists
+    const canvas = document.getElementById('canvasId') as HTMLCanvasElement;
+    if (!canvas) {
+      console.error('Canvas element not found!'); // Log 4
+      return;
+    }
+
+    // Log the data being passed to the chart
+    const chartData = {
+      labels: ['January', 'February', 'March', 'April', 'May'],
+      datasets: [{
+        label: 'Stock Price',
+        data: [10, 20, 30, 40, 50],
+        borderColor: 'blue',
+        fill: false,
+      }]
+    };
+    console.log('Chart data:', chartData); // Log 5
+
+    this.chart = new Chart(canvas, {
+      type: 'line',
+      data: chartData,
       options: {
-        responsive: true,
         scales: {
+          x: {
+            type: 'category',
+          },
           y: {
-            beginAtZero: false
+            type: 'linear',
           }
         }
       }
     });
+
+    console.log('Chart rendered successfully'); // Log 6
   }
 }
