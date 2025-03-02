@@ -1,74 +1,61 @@
-import { Component, OnInit } from '@angular/core';
-import { Chart, LinearScale, Title, Tooltip, Legend, CategoryScale, LineController, LineElement, PointElement } from 'chart.js';
-
-// Register the necessary components
-Chart.register(
-  LinearScale,
-  CategoryScale,
-  Title,
-  Tooltip,
-  Legend,
-  LineController, // Register the LineController
-  LineElement,   // Register the LineElement
-  PointElement   // Register the PointElement (required for line charts)
-);
+import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-data-display',
   templateUrl: './data-display.component.html',
-  styleUrls: ['./data-display.component.scss']
+  styleUrls: ['./data-display.component.css']
 })
 export class DataDisplayComponent implements OnInit {
-  chart: any;
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
 
-  ngOnInit(): void {
-    console.log('Component initialized'); // Log 1
+  ngOnInit() {
     this.fetchData();
   }
 
   fetchData() {
-    console.log('Fetching data...'); // Log 2
-    // Simulate fetching data
+    // Fetch data logic here
     this.renderChart();
   }
 
   renderChart() {
-    console.log('Rendering chart...'); // Log 3
-
-    // Check if canvas element exists
-    const canvas = document.getElementById('canvasId') as HTMLCanvasElement;
-    if (!canvas) {
-      console.error('Canvas element not found!'); // Log 4
-      return;
-    }
-
-    // Log the data being passed to the chart
-    const chartData = {
-      labels: ['January', 'February', 'March', 'April', 'May'],
-      datasets: [{
-        label: 'Stock Price',
-        data: [10, 20, 30, 40, 50],
-        borderColor: 'blue',
-        fill: false,
-      }]
-    };
-    console.log('Chart data:', chartData); // Log 5
-
-    this.chart = new Chart(canvas, {
-      type: 'line',
-      data: chartData,
-      options: {
-        scales: {
-          x: {
-            type: 'category',
-          },
-          y: {
-            type: 'linear',
+    if (isPlatformBrowser(this.platformId)) {
+      // Example using Chart.js
+      const ctx = document.getElementById('myChart') as HTMLCanvasElement;
+      const myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+          datasets: [{
+            label: '# of Votes',
+            data: [12, 19, 3, 5, 2, 3],
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.2)',
+              'rgba(54, 162, 235, 0.2)',
+              'rgba(255, 206, 86, 0.2)',
+              'rgba(75, 192, 192, 0.2)',
+              'rgba(153, 102, 255, 0.2)',
+              'rgba(255, 159, 64, 0.2)'
+            ],
+            borderColor: [
+              'rgba(255, 99, 132, 1)',
+              'rgba(54, 162, 235, 1)',
+              'rgba(255, 206, 86, 1)',
+              'rgba(75, 192, 192, 1)',
+              'rgba(153, 102, 255, 1)',
+              'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true
+            }
           }
         }
-      }
-    });
-
-    console.log('Chart rendered successfully'); // Log 6
+      });
+    }
   }
 }
